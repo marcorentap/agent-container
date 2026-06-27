@@ -1,5 +1,9 @@
-IMAGE   ?= agent-container
-CONTAINER ?= agent
+IMAGE         ?= agent-container
+CONTAINER     ?= agent
+DOTFILES_REPO ?=
+
+# Pass --build-arg DOTFILES_REPO=... only when set; avoids an empty-string arg.
+_DOTFILES_ARG := $(if $(DOTFILES_REPO),--build-arg DOTFILES_REPO=$(DOTFILES_REPO),)
 
 # Default target: build then launch an interactive session.
 .DEFAULT_GOAL := run
@@ -7,11 +11,11 @@ CONTAINER ?= agent
 # ── Build ──────────────────────────────────────────────────────────────────
 .PHONY: build
 build:
-	docker build -t $(IMAGE) .
+	docker build $(_DOTFILES_ARG) -t $(IMAGE) .
 
 # ── Run ────────────────────────────────────────────────────────────────────
-# Starts a fresh interactive container with the host HOME bind-mounted.
-# Equivalent to: docker-compose run --rm agent
+# Builds if needed, then launches an interactive zsh session.
+# Host $HOME is bind-mounted read-write at /home/agent/host inside the container.
 .PHONY: run
 run: build
 	docker run --rm -it \

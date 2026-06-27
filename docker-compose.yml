@@ -1,0 +1,15 @@
+name: agent-container
+
+services:
+  agent:
+    build:
+      context: .
+    image: agent-container
+    container_name: agent
+    # Bind-mount the host home directory into the container.
+    volumes:
+      - "${HOME}:/home/agent/host"
+    stdin_open: true
+    tty: true
+    # The Dockerfile's CMD is already `zsh`; listed here for explicitness.
+    command: zsh
